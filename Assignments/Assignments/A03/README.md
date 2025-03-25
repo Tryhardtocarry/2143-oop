@@ -32,7 +32,7 @@ Overriding maintains the interface — code that uses the base class can still w
 
 ---
 
-### 🔹 Real-World Analogy
+### Real-World 
 
 **Example:** A **smartphone** inherits from a **phone** — it can make calls (base functionality) but also has additional features like apps and internet access (extended behavior).  
 This aligns with OOP inheritance because the smartphone builds on the basic functionality of a phone and adds more capabilities.
@@ -41,7 +41,7 @@ This aligns with OOP inheritance because the smartphone builds on the basic func
 
 ## Part B: Minimal Coding Example
 
-### 🔹 Base Class: `Vehicle`
+###  Base Class: `Vehicle`
 
 ```cpp
 #include <iostream>
