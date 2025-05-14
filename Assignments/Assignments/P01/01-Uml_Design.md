@@ -1,26 +1,90 @@
-# UML Design 
+## Jason DB
 
-# Overview
+import json
 
-This project has three main classes:
 
-### Candy
-- Stores candy details name pric and quantity.
-- Has a method toDict( to convert its data to a dictionary for saving.
+class JsonDB:
+    def __init__(self, filepath):
+        self.filepath = filepath
+        self.data = None
+        self._load_data()
+        self.current = 0
 
-# JSONDBManager
-- Loads and saves data to a JSON file.
-- Has methods: load() and save(data).
+    def _load_data(self):
+        try:
+            with open(self.filepath, 'r') as f:
+                self.data = json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            self.data = []
 
-# CandyManager
-- Manages a list of Candy objects.
-- Uses JSONDBManager to load and save.
-- Can add or remove candy and update the database.
+    def _save_data(self):
+        with open(self.filepath, 'w') as f:
+            json.dump(self.data, f, indent=4)
 
-# Relationships
-- CandyManager uses JSONDBManager association.
-- CandyManager has a list of Candy composition.
+    def create(self, record):
+        self.data.append(record)
+        self._save_data()
+        return record
 
-# Why This Design?
-- Each class has one job .
-- Easy to update.
+    def atEnd(self):
+        return self.current == len(self.data) - 1
+
+    def getNext(self):
+        if not self.data:
+            return None
+        record = self.data[self.current]
+        self.current += 1
+        if self.current >= len(self.data):
+            self.current = 0
+        return record
+
+    def read(self, **filters):
+        if not filters:
+            return self.data
+        results = []
+        for item in self.data:
+            match = True
+            for key, value in filters.items():
+                if key not in item or value not in str(item[key]):
+                    match = False
+                    break
+            if match:
+                results.append(item)
+        return results
+
+    def update(self, record_id, updated_data):
+        try:
+            self.data[record_id].update(updated_data)
+            self._save_data()
+            return self.data[record_id]
+        except IndexError:
+            raise ValueError("Record ID not found.")
+
+    def delete(self, record_id):
+        try:
+            removed = self.data.pop(record_id)
+            self._save_data()
+            return removed
+        except IndexError:
+            raise ValueError("Record ID not found.")
+
+
+def main():
+    db = JsonDB("videogames.json")
+
+    print("All Action games:")
+    action_games = db.read(genre="Action")
+    print(action_games)
+
+    # Example: Add a new game
+    # new_game = {
+    #     "title": "Spider-Man 2",
+    #     "platform": "PlayStation 5",
+    #     "genre": "Action",
+    #     "year": 2023
+    # }
+    # db.create(new_game)
+
+
+if __name__ == "__main__":
+    main()
